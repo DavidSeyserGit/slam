@@ -59,6 +59,9 @@ int main()
         // Detect and compute features
         orb->detectAndCompute(frame, cv::noArray(), kp, desc);
 
+        // Create a black background image of the same size as the frame
+        cv::Mat blackBackground = cv::Mat::zeros(frame.size(), frame.type());
+
         // Match descriptors if there are previous descriptors
         if (!desc2.empty()) {
             matcher.match(desc, desc2, matches);
@@ -67,13 +70,13 @@ int main()
             // Draw matches
             for (size_t i = 0; i < std::min(inliers.size(), size_t(100)); ++i) {
                 const auto& match = inliers[i];
-                cv::line(frame, kp2[match.trainIdx].pt, kp[match.queryIdx].pt, cv::Scalar(0, 0, 255), 2);
+                cv::line(blackBackground, kp2[match.trainIdx].pt, kp[match.queryIdx].pt, cv::Scalar(0, 0, 255), 2);
             }
         }
 
-        // Draw keypoints
+        // Draw keypoints on the black background
         cv::Mat out;
-        cv::drawKeypoints(frame, kp, out, cv::Scalar(255, 200, 50), cv::DrawMatchesFlags::DEFAULT);
+        cv::drawKeypoints(blackBackground, kp, out, cv::Scalar(255, 200, 50), cv::DrawMatchesFlags::DEFAULT);
 
         cv::imshow("frame", out);
 
